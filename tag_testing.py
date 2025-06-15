@@ -4,8 +4,8 @@ from tqdm import tqdm
 
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"  
 MODEL = "command-light"  # Trial accounts support this model
-INPUT_CSV = "/Users/raofu/Desktop/ESG_Tracking/linkedin/linkedin_esg_weekly_summary_final.csv"
-OUTPUT_CSV = "linkedin_esg_weekly_summary_tagged.csv"
+INPUT_CSV = "esg_titles_contents.csv"
+OUTPUT_CSV = "esg_titles_contents_tagged.csv"
 
 TAGS = [
     "Carbon credits", "Carbon tax", "Carbon trading schemes", "Voluntary carbon markets", "Carbon offset projects",
