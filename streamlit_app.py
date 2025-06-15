@@ -3,8 +3,23 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="ESG‑Tracking Dashboard", layout="wide")
-
 st.title("📊 ESG Tracking Dashboard")
+
+# ESG Tags list
+TAGS = [
+    "Carbon credits", "Carbon tax", "Carbon trading schemes", "Voluntary carbon markets", "Carbon offset projects",
+    "Carbon neutrality targets", "Climate adaptation", "Climate risk disclosures", "Climate policy updates",
+    "Sea level rise", "Ocean acidification", "Emissions reduction pathways", "Net-zero targets",
+    "ESG regulations (global, EU, Asia, US)", "ESG disclosures (CSRD, SFDR, TCFD, SEC)", "Mandatory vs voluntary reporting",
+    "Sustainability reporting frameworks", "Greenwashing risks & cases", "ESG data quality and assurance",
+    "Corporate net-zero pledges", "Corporate ESG initiatives", "Supply chain sustainability", "Green finance",
+    "ESG investing trends", "Nature-based solutions", "Biodiversity credits", "Ecosystem services markets",
+    "Conservation finance", "Marine biodiversity", "Ocean health policy", "EHS compliance",
+    "Pollution regulations", "Waste management", "Circular economy", "Water regulation",
+    "Human rights", "Supply chain due diligence", "ESG-linked executive pay", "Board ESG oversight",
+    "Labor practices", "Diversity", "Green technology", "ESG data providers", "ESG litigation",
+    "Climate-related financial risks"
+]
 
 # Load final output files
 try:
@@ -16,8 +31,7 @@ except FileNotFoundError as e:
 
 # Sidebar filters
 st.sidebar.header("Filters")
-min_date = st.sidebar.date_input("From date", value=None)
-tag_filter = st.sidebar.multiselect("Tags", sorted(df_linkedin.columns[df_linkedin.columns.str.contains("Tag")]))
+tag_filter = st.sidebar.multiselect("Select ESG Tags", TAGS)
 
 # Display web content
 st.subheader("🌐 Web-scraped ESG Articles")
@@ -26,13 +40,14 @@ st.dataframe(df_web, height=300)
 # LinkedIn summaries
 st.subheader("🔗 LinkedIn ESGPedia Summaries")
 df = df_linkedin.copy()
-if min_date:
-    df = df[df['Date'] >= pd.to_datetime(min_date)]
+
+# Filter based on tags
 if tag_filter:
-    df = df[df['Predicted Tags'].str.contains("|".join(tag_filter), na=False)]
+    df = df[df['Predicted Tags'].str.contains("|".join(tag_filter), case=False, na=False)]
+
 st.dataframe(df, height=300)
 
-# Download option
+# Download options
 st.markdown("---")
 st.markdown("### 📥 Download Data")
 st.download_button("Download Web CSV", df_web.to_csv(index=False), "esg_web.csv")
