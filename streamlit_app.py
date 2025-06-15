@@ -1,15 +1,10 @@
 # streamlit_app.py
 import streamlit as st
 import pandas as pd
-from PIL import Image
-import streamlit as st
 
-
-img = Image.open("SLNG-Logo-Colour.png")
-st.image(img, width=200)
 st.set_page_config(page_title="ESG‑Tracking Dashboard", layout="wide")
 
-st.title("ESG Tracking Dashboard")
+st.title("📊 ESG Tracking Dashboard")
 
 # Load final output files
 try:
