@@ -8,8 +8,8 @@ st.title("📊 ESG Tracking Dashboard")
 
 # Load final output files
 try:
-    df_web = pd.read_csv("esg_titles_contents.csv")
-    df_linkedin = pd.read_csv("linkedin/linkedin_esg_weekly_summary_tagged_with_summary.csv")
+    df_web = pd.read_csv("esg_titles_contents_with_summary_cleaned.csv")
+    df_linkedin = pd.read_csv("linkedin_esg_weekly_summary_tagged_with_summary.csv")
 except FileNotFoundError as e:
     st.error(f"Could not load data: {e}")
     st.stop()
