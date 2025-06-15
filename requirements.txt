@@ -1,0 +1,7 @@
+streamlit
+selenium
+pandas
+newspaper3k
+bs4
+cohere
+tqdm
