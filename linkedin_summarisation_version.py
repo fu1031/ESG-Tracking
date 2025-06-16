@@ -3,34 +3,35 @@ import cohere
 from tqdm import tqdm
 from newspaper import Article
 
+# === CONFIG ===
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"
-MODEL = "command-light"
+MODEL = "command-light"  # Free-tier model
 INPUT_CSV = "linkedin_esg_weekly_summary_tagged.csv"
 OUTPUT_CSV = "linkedin_esg_weekly_summary_tagged_with_summary.csv"
 
+# === INIT ===
 co = cohere.Client(API_KEY)
-
 df = pd.read_csv(INPUT_CSV)
 
-# Drop rows with missing, error, or irrelevant preview text
+# === FILTER OUT BAD ROWS ===
 def is_valid_text(txt):
     if not isinstance(txt, str):
         return False
-    txt = txt.lower()
+    t = txt.lower()
     return (
-        "404" not in txt
-        and "not found" not in txt
-        and "error" not in txt
-        and "this link will take you to a page" not in txt
-        and len(txt.strip()) > 20
+        "404" not in t
+        and "not found" not in t
+        and "error" not in t
+        and "this link will take you to a page" not in t
+        and len(t.strip()) > 20
     )
 
 df = df[df["Preview Text"].apply(is_valid_text)].copy()
 
-# Extract the last Final URL from 'Final URL' column
+# === EXTRACT FINAL URL ===
 df["URL"] = df["Final URL"].apply(lambda x: str(x).split("|||")[-1].strip())
 
-# Fetch article title
+# === FETCH ARTICLE TITLES ===
 titles = []
 for url in tqdm(df["URL"], desc="Fetching titles"):
     try:
@@ -38,32 +39,37 @@ for url in tqdm(df["URL"], desc="Fetching titles"):
         article.download()
         article.parse()
         titles.append(article.title.strip())
-    except Exception as e:
+    except Exception:
         titles.append("Error extracting title")
-
 df["Article Title"] = titles
 
-# Summarize each article
-texts = df["Preview Text"].tolist()
+# === GENERATE SUMMARIES ===
 summaries = []
-
-for text in tqdm(texts, desc="Summarizing articles"):
+for text in tqdm(df["Preview Text"], desc="Summarizing"):
     try:
-        prompt = f"Summarize the following ESG article in 1–2 sentences focusing on key insights:\n\n{text[:1500]}"
+        prompt = (
+            "Summarize the following ESG article in 1–2 concise sentences focusing on the key insights:\n\n"
+            f"{text[:1500]}"
+        )
         response = co.generate(
             model=MODEL,
             prompt=prompt,
             max_tokens=100,
             temperature=0.4
         )
-        summary = response.generations[0].text.strip()
+        summaries.append(response.generations[0].text.strip())
     except Exception as e:
-        summary = f"Error: {e}"
-    summaries.append(summary)
-
+        summaries.append(f"Error: {e}")
 df["Summary"] = summaries
 
-# Save selected columns in desired order
-output_df = df[["Article Title", "Preview Text", "Predicted Tags", "Summary", "URL"]]
+# === OUTPUT CSV ===
+output_df = df[[
+    "Article Title",
+    "Preview Text",
+    "Predicted Tags",
+    "Summary",
+    "URL"
+]].drop_duplicates(subset=["URL", "Preview Text"])  # remove duplicates
+
 output_df.to_csv(OUTPUT_CSV, index=False)
-print(f"✅ Done! Cleaned and summarized file saved to '{OUTPUT_CSV}'")
+print(f"Done! Cleaned and summarized file saved to '{OUTPUT_CSV}'")
