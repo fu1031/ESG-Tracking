@@ -6,12 +6,12 @@ from newspaper import Article
 # === CONFIG ===
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"
 MODEL = "command-light"  # Free-tier model
-INPUT_CSV = "linkedin_esg_weekly_summary_tagged.csv"
-OUTPUT_CSV = "linkedin_esg_weekly_summary_tagged_with_summary.csv"
+INPUT_FILE = "linkedin_esg_weekly_summary_tagged.xlsx"
+OUTPUT_FILE = "linkedin_esg_weekly_summary_tagged_with_summary.xlsx"
 
 # === INIT ===
 co = cohere.Client(API_KEY)
-df = pd.read_csv(INPUT_CSV)
+df = pd.read_excel(INPUT_FILE)
 
 # === FILTER OUT BAD ROWS ===
 def is_valid_text(txt):
@@ -71,5 +71,5 @@ output_df = df[[
     "URL"
 ]].drop_duplicates(subset=["URL", "Preview Text"])  # remove duplicates
 
-output_df.to_csv(OUTPUT_CSV, index=False)
-print(f"Done! Cleaned and summarized file saved to '{OUTPUT_CSV}'")
+output_df.to_excel(OUTPUT_FILE, index=False)
+print(f"Done! Cleaned and summarized file saved to '{OUTPUT_FILE}'")

@@ -7,12 +7,12 @@ import re
 # === CONFIG ===
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"
 MODEL = "command-light"
-INPUT_CSV = "esg_titles_contents_tagged.csv"
-OUTPUT_CSV = "esg_titles_contents_with_summary_cleaned.csv"
+INPUT_FILE = "esg_titles_contents_tagged.xlsx"
+OUTPUT_FILE = "esg_titles_contents_with_summary_cleaned.xlsx"
 
 # === INIT ===
 co = cohere.Client(API_KEY)
-df = pd.read_csv(INPUT_CSV)
+df = pd.read_excel(INPUT_FILE)
 
 # === Cleanup invalid rows ===
 df = df[~df["Preview Text"]
@@ -67,5 +67,5 @@ final_df = df[[
     "Summary",
     "URL"
 ]]
-final_df.to_csv(OUTPUT_CSV, index=False)
-print(f"Cleaned output saved to '{OUTPUT_CSV}'")
+final_df.to_excel(OUTPUT_FILE, index=False)
+print(f"Cleaned output saved to '{OUTPUT_FILE}'")

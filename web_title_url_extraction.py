@@ -25,7 +25,8 @@ urls = [
     "https://unfccc.int/about-us/reports-highlights/un-climate-change-quarterly-updates",
     "https://www.weather.gov.sg/home-all-news/?yearnews=2015",
     "https://www.pub.gov.sg/Resources/Publications",
-    "https://www.ema.gov.sg/news-events/news?id=media-releases"
+    "https://www.ema.gov.sg/news-events/news?id=media-releases",
+    "https://www.esgtoday.com/category/esg-news/"
 ]
 
 # ESG-relevant keywords for title filtering
@@ -96,10 +97,8 @@ for site in urls:
 deduped_titles = list({(t.lower().strip(), u) for t, u in all_titles})
 deduped_titles.sort()
 
-# Save to CSV
-with open("esg_titles_cleaned.csv", "w", newline="", encoding="utf-8") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Title", "URL"])
-    writer.writerows(deduped_titles)
-
-print(f"Cleaned, deduplicated ESG titles saved to 'esg_titles_cleaned.csv'")
+# === Save to cleaned, deduplicated Excel file ===
+import pandas as pd
+df = pd.DataFrame(all_results, columns=["Title", "URL"])
+df.to_excel("esg_titles_cleaned.xlsx", index=False)
+print("✅ Cleaned, deduplicated ESG titles saved to 'esg_titles_cleaned.xlsx'")

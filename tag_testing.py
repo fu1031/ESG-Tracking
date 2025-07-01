@@ -4,9 +4,10 @@ from tqdm import tqdm
 
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"  
 MODEL = "command-light"  # Trial accounts support this model
-INPUT_CSV = "esg_titles_contents.csv"
-OUTPUT_CSV = "esg_titles_contents_tagged.csv"
-
+INPUT_FILE = "esg_titles_contents.xlsx"
+OUTPUT_FILE = "esg_titles_contents_tagged.xlsx"
+#Add in article 6
+#Add in region, climate (need to be more detailed for the sub category) filter
 TAGS = [
     "Carbon credits", "Carbon tax", "Carbon trading schemes", "Voluntary carbon markets", "Carbon offset projects",
     "Carbon neutrality targets", "Climate adaptation", "Climate risk disclosures", "Climate policy updates",
@@ -24,7 +25,7 @@ TAGS = [
 
 co = cohere.Client(API_KEY)
 
-df = pd.read_csv(INPUT_CSV)
+df = pd.read_excel(INPUT_FILE)
 preview_texts = df["Preview Text"].fillna("").tolist()
 predicted_tags = []
 
@@ -74,5 +75,5 @@ Category:"""
     predicted_tags.append(prediction)
 # Add results
 df["Predicted Tags"] = predicted_tags
-df.to_csv(OUTPUT_CSV, index=False)
-print(f"Done! Tagged results saved to '{OUTPUT_CSV}'")
+df.to_excel(OUTPUT_FILE, index=False)
+print(f"✅ Done! Tagged results saved to '{OUTPUT_FILE}'")

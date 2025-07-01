@@ -3,9 +3,10 @@ from newspaper import Article
 from tqdm import tqdm
 import time
 
+# Load input
 df = pd.read_csv("esg_titles_cleaned.csv")
 
-# Drop rows with missing or duplicated URLs
+# Drop missing or duplicate URLs
 df = df.dropna(subset=['URL'])
 df = df.drop_duplicates(subset='URL')
 
@@ -21,16 +22,19 @@ for url in tqdm(df['URL'], desc="Extracting articles"):
         content = article.text.strip()
 
         # Filter out irrelevant or broken content
-        if not content or "404" in content.lower() or "not found" in content.lower() or "access denied" in content.lower():
+        if not content or any(term in content.lower() for term in ["404", "not found", "access denied"]):
             extracted_texts.append("")  
         else:
             extracted_texts.append(content)
-    except Exception as e:
+    except Exception:
         extracted_texts.append("")  # Mark failed entries as empty
-    time.sleep(1) 
+    time.sleep(1)
 
+# Add column and filter out empty text rows
 df['Preview Text'] = extracted_texts
-df = df[df['Preview Text'].str.strip().astype(bool)]  # Keep only rows with non-empty preview text
+df = df[df['Preview Text'].str.strip().astype(bool)]
 
-df.to_csv("esg_titles_contents.csv", index=False)
-print("Cleaned and filtered ESG titles saved to 'esg_titles_contents.csv'")
+# Save as Excel
+output_file = "esg_titles_contents.xlsx"
+df.to_excel(output_file, index=False)
+print(f"✅ Cleaned and filtered ESG titles saved to '{output_file}'")
