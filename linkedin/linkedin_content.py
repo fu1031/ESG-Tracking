@@ -109,8 +109,8 @@ from tqdm import tqdm
 import datetime
 
 # === CONFIG ===
-INPUT_CSV = "linkedin_esg_weekly_summary.csv"
-OUTPUT_CSV = "linkedin_esg_weekly_summary_cleaned.csv"
+INPUT_FILE = "linkedin/linkedin_esg_weekly_summary.csv"
+OUTPUT_FILE = "linkedin_esg_weekly_summary_cleaned.xlsx"
 COOKIE_FILE = "linkedin_cookies.pkl"
 SLEEP_BETWEEN_LINKS = 2
 
@@ -143,7 +143,7 @@ else:
     exit()
 
 # === Load Input CSV ===
-df = pd.read_csv(INPUT_CSV)
+df = pd.read_csv(INPUT_FILE)
 
 # Prepare lists to collect output
 titles, previews, final_urls, dates = [], [], [], []
@@ -208,5 +208,5 @@ clean_df = pd.DataFrame({
     "Date": dates
 })
 
-clean_df.to_csv(OUTPUT_CSV, index=False)
-print(f"Cleaned CSV with Titles saved to '{OUTPUT_CSV}'.")
+clean_df.to_excel(OUTPUT_FILE, index=False)
+print(f"Cleaned file with Titles saved to '{OUTPUT_FILE}'.")

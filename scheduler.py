@@ -8,8 +8,8 @@ def run_all():
     scripts = [
         "python web_title_url_extraction.py",
         "python web_preview.py",
-        "python summarisation_testing.py",
         "python tag_testing.py",
+        "python summarisation_testing.py",
         "python linkedin/linkedin_content.py"
     ]
     for cmd in scripts:

@@ -3,14 +3,14 @@
 # Web Title Extractor Script for ESG Web Tracking (Direct Scrape)
 # ---------------------------------------------------------------
 # Purpose:
-#   - Scrapes titles and links from ESG-relevant pages(possible extension in the future).
-#   - Filters based on ESG-related keywords(can be added with future expansion).
-#   - Removes common boilerplate links and duplicate titles.
-#   - Saves structured results to a CSV file.
+#   - Scrapes titles and links from ESG-relevant pages.
+#   - Filters based on ESG-related keywords.
+#   - Removes boilerplate links and duplicate titles.
+#   - Saves structured results to an Excel file.
 
 import requests
 from bs4 import BeautifulSoup
-import csv
+import pandas as pd
 
 # Target URLs for ESG content tracking
 urls = [
@@ -35,7 +35,7 @@ esg_keywords = [
     "governance", "policy", "energy", "emissions", "scope 3", "net zero"
 ]
 
-# Skip phrases to avoid generic or irrelevant links
+# Phrases to skip (irrelevant or boilerplate)
 skip_phrases = [
     "learn more", "contact", "support", "login", "search", "menu", "resources",
     "subscribe", "newsroom", "careers", "events", "platform", "about", "home",
@@ -83,22 +83,22 @@ def extract_titles(base_url):
         return results
 
     except Exception as e:
-        print(f"Failed to scrape {base_url}: {e}")
+        print(f"❌ Failed to scrape {base_url}: {e}")
         return []
 
-# Scrape all pages and collect results
+# === Scrape all URLs ===
 all_titles = []
 for site in urls:
-    print(f"Scraping: {site}")
-    page_titles = extract_titles(site)
-    all_titles.extend(page_titles)
+    print(f"🔍 Scraping: {site}")
+    titles = extract_titles(site)
+    all_titles.extend(titles)
 
-# Remove exact duplicates
-deduped_titles = list({(t.lower().strip(), u) for t, u in all_titles})
+# === Deduplicate by lowercase title text ===
+deduped_titles = list({(title.lower().strip(), url) for title, url in all_titles})
+deduped_titles = [(title.title(), url) for title, url in deduped_titles]  # Title case cleanup
 deduped_titles.sort()
 
-# === Save to cleaned, deduplicated Excel file ===
-import pandas as pd
-df = pd.DataFrame(all_results, columns=["Title", "URL"])
+# === Save to Excel ===
+df = pd.DataFrame(deduped_titles, columns=["Title", "URL"])
 df.to_excel("esg_titles_cleaned.xlsx", index=False)
 print("✅ Cleaned, deduplicated ESG titles saved to 'esg_titles_cleaned.xlsx'")
