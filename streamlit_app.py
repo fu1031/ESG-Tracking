@@ -27,7 +27,7 @@ REGIONS = ["Singapore", "Asia", "APAC", "Europe", "EU", "United States", "US", "
 # === Load final output files ===
 try:
     df_web = pd.read_excel("esg_titles_contents_with_summary_cleaned.xlsx")
-    df_linkedin = pd.read_excel("linkedin_esg_weekly_summary_tagged_with_summary.xlsx")
+    df_linkedin = pd.read_excel("linkedin/linkedin_esg_weekly_summary_tagged_with_summary.xlsx")
 except FileNotFoundError as e:
     st.error(f"Could not load data: {e}")
     st.stop()
