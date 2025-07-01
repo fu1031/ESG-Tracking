@@ -5,4 +5,4 @@ newspaper3k
 bs4
 cohere
 tqdm
-openxyl
+openpyxl
