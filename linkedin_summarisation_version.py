@@ -6,12 +6,12 @@ from newspaper import Article
 # === CONFIG ===
 API_KEY = "2gjGnyG7Oourqr7BlBo6YV7S4BRbf2JZp75io4Pt"
 MODEL = "command-light"  # Free-tier model
-INPUT_FILE = "linkedin_esg_weekly_summary_tagged.xlsx"
+INPUT_FILE = "linkedin_esg_weekly_summary_tagged.csv"
 OUTPUT_FILE = "linkedin_esg_weekly_summary_tagged_with_summary.xlsx"
 
 # === INIT ===
 co = cohere.Client(API_KEY)
-df = pd.read_excel(INPUT_FILE)
+df = pd.read_csv(INPUT_FILE)
 
 # === FILTER OUT BAD ROWS ===
 def is_valid_text(txt):
