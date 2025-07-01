@@ -1,6 +1,6 @@
-# streamlit_app.py
 import streamlit as st
 import pandas as pd
+import io
 
 st.set_page_config(page_title="ESG‑Tracking Dashboard", layout="wide")
 st.title("📊 ESG Tracking Dashboard")
@@ -41,7 +41,6 @@ region_filter = st.sidebar.multiselect("Select Region Keywords", REGIONS)
 st.subheader("🌐 Web-scraped ESG Articles")
 df_web_filtered = df_web.copy()
 
-# Region filtering
 if region_filter:
     df_web_filtered = df_web_filtered[
         df_web_filtered["Preview Text"].str.contains("|".join(region_filter), case=False, na=False)
@@ -54,13 +53,11 @@ st.dataframe(df_web_filtered, height=300)
 st.subheader("🔗 LinkedIn ESGPedia Summaries")
 df_linkedin_filtered = df_linkedin.copy()
 
-# Tag filtering
 if tag_filter:
     df_linkedin_filtered = df_linkedin_filtered[
         df_linkedin_filtered["Predicted Tags"].str.contains("|".join(tag_filter), case=False, na=False)
     ]
 
-# Region filtering
 if region_filter:
     df_linkedin_filtered = df_linkedin_filtered[
         df_linkedin_filtered["Preview Text"].str.contains("|".join(region_filter), case=False, na=False)
@@ -72,5 +69,27 @@ st.dataframe(df_linkedin_filtered, height=300)
 # === Download options ===
 st.markdown("---")
 st.markdown("### 📥 Download Data")
-st.download_button("Download Web Excel File", df_web_filtered.to_excel(index=False), "esg_web.xlsx")
-st.download_button("Download LinkedIn Excel File", df_linkedin_filtered.to_excel(index=False), "esg_linkedin.xlsx")
+
+# Convert dataframes to Excel buffers
+web_buffer = io.BytesIO()
+df_web_filtered.to_excel(web_buffer, index=False, engine='openpyxl')
+web_buffer.seek(0)
+
+linkedin_buffer = io.BytesIO()
+df_linkedin_filtered.to_excel(linkedin_buffer, index=False, engine='openpyxl')
+linkedin_buffer.seek(0)
+
+# Streamlit download buttons
+st.download_button(
+    label="Download Web Excel File",
+    data=web_buffer,
+    file_name="esg_web.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+st.download_button(
+    label="Download LinkedIn Excel File",
+    data=linkedin_buffer,
+    file_name="esg_linkedin.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
