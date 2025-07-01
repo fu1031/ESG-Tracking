@@ -4,7 +4,7 @@ from tqdm import tqdm
 import time
 
 # Load input
-df = pd.read_csv("esg_titles_cleaned.csv")
+df = pd.read_excel("esg_titles_cleaned.xlsx")
 
 # Drop missing or duplicate URLs
 df = df.dropna(subset=['URL'])
