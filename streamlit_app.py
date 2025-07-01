@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="ESG‑Tracking Dashboard", layout="wide")
 st.title("📊 ESG Tracking Dashboard")
 
-# ESG Tags list
+# === ESG Tags list ===
 TAGS = [
     "Carbon credits", "Carbon tax", "Carbon trading schemes", "Voluntary carbon markets", "Carbon offset projects",
     "Carbon neutrality targets", "Climate adaptation", "Climate risk disclosures", "Climate policy updates",
@@ -21,34 +21,56 @@ TAGS = [
     "Climate-related financial risks"
 ]
 
-# Load final output files
+# === Region keywords ===
+REGIONS = ["Singapore", "Asia", "APAC", "Europe", "EU", "United States", "US", "Global"]
+
+# === Load final output files ===
 try:
-    df_web = pd.read_csv("esg_titles_contents_with_summary_cleaned.csv")
-    df_linkedin = pd.read_csv("linkedin_esg_weekly_summary_tagged_with_summary.csv")
+    df_web = pd.read_excel("esg_titles_contents_with_summary_cleaned.xlsx")
+    df_linkedin = pd.read_excel("linkedin_esg_weekly_summary_tagged_with_summary.xlsx")
 except FileNotFoundError as e:
     st.error(f"Could not load data: {e}")
     st.stop()
 
-# Sidebar filters
+# === Sidebar filters ===
 st.sidebar.header("Filters")
 tag_filter = st.sidebar.multiselect("Select ESG Tags", TAGS)
+region_filter = st.sidebar.multiselect("Select Region Keywords", REGIONS)
 
-# Display web content
+# === Display web content ===
 st.subheader("🌐 Web-scraped ESG Articles")
-st.dataframe(df_web, height=300)
+df_web_filtered = df_web.copy()
 
-# LinkedIn summaries
+# Region filtering
+if region_filter:
+    df_web_filtered = df_web_filtered[
+        df_web_filtered["Preview Text"].str.contains("|".join(region_filter), case=False, na=False)
+        | df_web_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
+    ]
+
+st.dataframe(df_web_filtered, height=300)
+
+# === LinkedIn summaries ===
 st.subheader("🔗 LinkedIn ESGPedia Summaries")
-df = df_linkedin.copy()
+df_linkedin_filtered = df_linkedin.copy()
 
-# Filter based on tags
+# Tag filtering
 if tag_filter:
-    df = df[df['Predicted Tags'].str.contains("|".join(tag_filter), case=False, na=False)]
+    df_linkedin_filtered = df_linkedin_filtered[
+        df_linkedin_filtered["Predicted Tags"].str.contains("|".join(tag_filter), case=False, na=False)
+    ]
 
-st.dataframe(df, height=300)
+# Region filtering
+if region_filter:
+    df_linkedin_filtered = df_linkedin_filtered[
+        df_linkedin_filtered["Preview Text"].str.contains("|".join(region_filter), case=False, na=False)
+        | df_linkedin_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
+    ]
 
-# Download options
+st.dataframe(df_linkedin_filtered, height=300)
+
+# === Download options ===
 st.markdown("---")
 st.markdown("### 📥 Download Data")
-st.download_button("Download Web CSV", df_web.to_csv(index=False), "esg_web.csv")
-st.download_button("Download LinkedIn CSV", df_linkedin.to_csv(index=False), "esg_linkedin.csv")
+st.download_button("Download Web Excel File", df_web_filtered.to_excel(index=False), "esg_web.xlsx")
+st.download_button("Download LinkedIn Excel File", df_linkedin_filtered.to_excel(index=False), "esg_linkedin.xlsx")
