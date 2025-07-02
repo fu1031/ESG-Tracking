@@ -47,6 +47,10 @@ if region_filter:
         | df_web_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
     ]
 
+# Reorder columns if they exist
+expected_cols = ["Article Title", "Predicted Tags", "Summary", "URL", "Preview Text"]
+df_web_filtered = df_web_filtered[[col for col in expected_cols if col in df_web_filtered.columns]]
+
 st.dataframe(df_web_filtered, height=300)
 
 # === LinkedIn summaries ===
@@ -64,6 +68,9 @@ if region_filter:
         | df_linkedin_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
     ]
 
+# Reorder columns
+df_linkedin_filtered = df_linkedin_filtered[[col for col in expected_cols if col in df_linkedin_filtered.columns]]
+
 st.dataframe(df_linkedin_filtered, height=300)
 
 # === Download options ===
@@ -79,7 +86,6 @@ linkedin_buffer = io.BytesIO()
 df_linkedin_filtered.to_excel(linkedin_buffer, index=False, engine='openpyxl')
 linkedin_buffer.seek(0)
 
-# Streamlit download buttons
 st.download_button(
     label="Download Web Excel File",
     data=web_buffer,
