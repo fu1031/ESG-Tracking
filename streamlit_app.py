@@ -24,6 +24,13 @@ TAGS = [
 # === Region keywords ===
 REGIONS = ["Singapore", "Asia", "APAC", "Europe", "EU", "United States", "US", "Global"]
 
+# === Climate keywords ===
+CLIMATE_TOPICS = [
+    "Ocean acidification", "Global warming", "Sea level rise", "Melting ice caps", "Climate change",
+    "Extreme weather", "Temperature rise", "Greenhouse gas emissions", "Climate resilience",
+    "Methane leakage", "Climate tipping points", "El Niño", "La Niña"
+]
+
 # === Load final output files ===
 try:
     df_web = pd.read_excel("esg_titles_contents_with_summary_cleaned.xlsx")
@@ -36,6 +43,7 @@ except FileNotFoundError as e:
 st.sidebar.header("Filters")
 tag_filter = st.sidebar.multiselect("Select ESG Tags", TAGS)
 region_filter = st.sidebar.multiselect("Select Region Keywords", REGIONS)
+climate_filter = st.sidebar.multiselect("Select Climate Topics", CLIMATE_TOPICS)
 
 # === Display web content ===
 st.subheader("🌐 Web-scraped ESG Articles")
@@ -47,10 +55,14 @@ if region_filter:
         | df_web_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
     ]
 
-# Reorder columns if they exist
+if climate_filter:
+    df_web_filtered = df_web_filtered[
+        df_web_filtered["Preview Text"].str.contains("|".join(climate_filter), case=False, na=False)
+        | df_web_filtered["Summary"].str.contains("|".join(climate_filter), case=False, na=False)
+    ]
+
 expected_cols = ["Article Title", "Predicted Tags", "Summary", "URL", "Preview Text"]
 df_web_filtered = df_web_filtered[[col for col in expected_cols if col in df_web_filtered.columns]]
-
 st.dataframe(df_web_filtered, height=300)
 
 # === LinkedIn summaries ===
@@ -68,16 +80,19 @@ if region_filter:
         | df_linkedin_filtered["Summary"].str.contains("|".join(region_filter), case=False, na=False)
     ]
 
-# Reorder columns
-df_linkedin_filtered = df_linkedin_filtered[[col for col in expected_cols if col in df_linkedin_filtered.columns]]
+if climate_filter:
+    df_linkedin_filtered = df_linkedin_filtered[
+        df_linkedin_filtered["Preview Text"].str.contains("|".join(climate_filter), case=False, na=False)
+        | df_linkedin_filtered["Summary"].str.contains("|".join(climate_filter), case=False, na=False)
+    ]
 
+df_linkedin_filtered = df_linkedin_filtered[[col for col in expected_cols if col in df_linkedin_filtered.columns]]
 st.dataframe(df_linkedin_filtered, height=300)
 
 # === Download options ===
 st.markdown("---")
 st.markdown("### 📥 Download Data")
 
-# Convert dataframes to Excel buffers
 web_buffer = io.BytesIO()
 df_web_filtered.to_excel(web_buffer, index=False, engine='openpyxl')
 web_buffer.seek(0)
